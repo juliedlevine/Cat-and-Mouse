@@ -1,6 +1,7 @@
 import pygame
 import random
 import time
+from time import gmtime, strftime
 
 KEY_UP = 273
 KEY_DOWN = 274
@@ -12,7 +13,6 @@ class Cat(object):
         self.height = 96
         self.width = 96
         self.image = pygame.image.load("images/cat.png").convert_alpha()
-        # Cat location
         self.x = 700
         self.y = 472
         self.speed_x = 0
@@ -142,13 +142,6 @@ def main():
 
     while not stop_game:
 
-        # Game timer
-        # for t in range(60, -1, -1):
-        #     seconds = t
-        #     time.sleep(1.0)
-        #     time_left = "00:%d" % seconds
-        #     print time_left
-
         #Counter for sending out a new mouse
         counter += 1
         if counter >= 30:
@@ -199,6 +192,12 @@ def main():
             screen.blit(milk, (320, 510))
             start_game = False
             show_winner = True
+
+        # Game timer
+        seconds_counter = strftime("00:%S", gmtime())
+        font = pygame.font.Font(None, 50)
+        time_text = font.render(seconds_counter, True, (255, 255,255))
+        screen.blit(time_text, (510, 520))
 
         ##### GAME DISPLAY ######
         # Show and hide instructions blurb
