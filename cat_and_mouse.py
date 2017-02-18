@@ -1,15 +1,25 @@
 import pygame
 import random
 import time
-from time import gmtime, strftime
 
 KEY_UP = 273
 KEY_DOWN = 274
 KEY_LEFT = 276
 KEY_RIGHT = 275
 
-class Cat(object):
+class Animal(object):
+    def render(self, screen):
+        screen.blit(self.image, (self.x, self.y))
+
+    def collision_detection(self, cat, mouse, height, width):
+        if (cat.x < (mouse.x + mouse.width) and (cat.x + cat.width) > mouse.x and cat.y < (mouse.y + mouse.height) and (cat.height + cat.y) > mouse.y):
+            return False
+        else:
+            return True
+
+class Cat(Animal):
     def __init__(self):
+        Animal.__init__(self)
         self.height = 78
         self.width = 96
         self.image = pygame.image.load("images/cat.png").convert_alpha()
@@ -23,48 +33,30 @@ class Cat(object):
             self.speed_y = 10
         elif event.key == KEY_UP:
             self.speed_y = -10
-        # DISABLE LEFT AND RIGHT FOR NOW
-        # elif event.key == KEY_LEFT:
-        #     self.speed_x = -5
-        # elif event.key == KEY_RIGHT:
-        #     self.speed_x = 5
 
     def keyup(self, event):
         if event.key == KEY_DOWN:
             self.speed_y = 0
         elif event.key == KEY_UP:
             self.speed_y = 0
-        # DISABLE LEFT AND RIGHT FOR NOW
-        # elif event.key == KEY_LEFT:
-        #     self.speed_x = 0
-        # elif event.key == KEY_RIGHT:
-        #     self.speed_x = 0
 
     def update(self, width, height):
-        if self.y < 0: # Check top
+        # Check top and bottom (keep cat in bounds)
+        if self.y < 0:
             self.y = 0
-        if self.y + self.height > height: # Check bottom
+        if self.y + self.height > height:
             self.y = height - self.height
         else:
             self.y += self.speed_y
 
-        if self.x < 0: # Check left
-            self.x = 0
-        elif self.x + self.width > width: # Check right
-            self.x = width - self.width
-        else:
-            self.x += self.speed_x
-
-    def render(self, screen):
-        screen.blit(self.image, (self.x, self.y))
-
-class Mouse(object):
+class Mouse(Animal):
     def __init__(self):
+        Animal.__init__(self)
         self.height = 27
         self.width = 64
         self.image = pygame.image.load("images/mouse.png").convert_alpha()
         self.x = -64
-        self.y = 400 #random.randint(64, 500)
+        self.y = random.randint(64, 500)
         self.speed_x = random.randint(40, 70)
         self.speed_y = 0
 
@@ -72,90 +64,22 @@ class Mouse(object):
         self.y += self.speed_y
         self.x += self.speed_x
 
-    def render(self, screen):
-        screen.blit(self.image, (self.x, self.y))
 
 def main():
 
-    def print_instructions():
-        font = pygame.font.Font(None, 30)
-        font2 = pygame.font.Font(None, 25)
-        text1 = font.render("CAT AND MOUSE", True, (255, 255, 255))
-        text2 = font2.render("Catch as many mice as you can!", True, (255, 255, 255))
-        text3 = font2.render("Use the up and down keys to", True, (255, 255, 255))
-        text4 = font2.render("move your cat up and down.", True, (255, 255, 255))
-        text5 = font2.render("For every 5 mice you catch", True, (255, 255, 255))
-        text6 = font2.render("you'll get a milk carton.", True, (255, 255, 255))
-        text7 = font2.render("Get 4 milk cartons and you win!", True, (255, 255, 255))
-        text8 = font2.render("Ready to play? (y / n)", True, (255, 255, 255))
-        blurb = pygame.image.load("images/chat.png")
-        screen.blit(blurb, (400, 100))
-        screen.blit(text1, (500, 150))
-        screen.blit(text2, (440, 200))
-        screen.blit(text3, (440, 220))
-        screen.blit(text4, (440, 240))
-        screen.blit(text5, (440, 260))
-        screen.blit(text6, (440, 280))
-        screen.blit(text7, (440, 300))
-        screen.blit(text8, (440, 320))
+    # --------- GAME INITIALIZATION --------- #
 
-    def print_winner():
-        font = pygame.font.Font(None, 30)
-        font2 = pygame.font.Font(None, 25)
-        text1 = font.render("CONGRATS YOU WON!", True, (255, 255, 255))
-        text2 = font2.render("Very nice work.", True, (255, 255, 255))
-        text3 = font2.render("Kitty now gets to drink all", True, (255, 255, 255))
-        text4 = font2.render("this milk as his reward.", True, (255, 255, 255))
-        text5 = font2.render("MEEEEEEOOOOOW", True, (255, 255, 255))
-        text6 = font2.render("Do you want to play again? (y / n)", True, (255, 255, 255))
-        blurb = pygame.image.load("images/chat.png")
-        screen.blit(blurb, (400, 100))
-        screen.blit(text1, (500, 150))
-        screen.blit(text2, (440, 200))
-        screen.blit(text3, (440, 220))
-        screen.blit(text4, (440, 240))
-        screen.blit(text5, (440, 260))
-        screen.blit(text6, (440, 280))
-
-    def print_loser():
-        font = pygame.font.Font(None, 30)
-        font2 = pygame.font.Font(None, 25)
-        text1 = font.render("OH NO TIME RAN OUT!", True, (255, 255, 255))
-        text2 = font2.render("Very sad.", True, (255, 255, 255))
-        text3 = font2.render("Kitty is so thirsty and", True, (255, 255, 255))
-        text4 = font2.render("doesn't have enough milk to drink.", True, (255, 255, 255))
-        text5 = font2.render("MEEEEEEOOOOOW", True, (255, 255, 255))
-        text6 = font2.render("Do you want to play again? (y / n)", True, (255, 255, 255))
-        blurb = pygame.image.load("images/chat.png")
-        screen.blit(blurb, (400, 100))
-        screen.blit(text1, (500, 150))
-        screen.blit(text2, (440, 200))
-        screen.blit(text3, (440, 220))
-        screen.blit(text4, (440, 240))
-        screen.blit(text5, (440, 260))
-        screen.blit(text6, (440, 280))
-
-    def collision_detection():
-        if (cat.x + 96 < mouse.x) or (mouse.x + 64 < cat.x) or (cat.y + 64 < mouse.y) or (mouse.y + 64 < cat.y):
-            return True
-        else:
-            return False
-        if (cat.x < (mouse.x + mouse.width) and (cat.x + cat.width) > mouse.x and cat.y < (mouse.y + mouse.height) and (cat.height + cat.y) > mouse.y):
-            return False
-        else:
-            return True
-
-
+    # Background size
     width = 799
     height = 568
 
+    # Initialize pygame
     pygame.init()
     screen = pygame.display.set_mode((width, height))
     pygame.display.set_caption('Cat and Mouse')
     clock = pygame.time.Clock()
 
-    # Game initialization
-
+    # create objects and set game variables
     cat = Cat()
     mouse = Mouse()
     caught_mice = set()
@@ -163,6 +87,7 @@ def main():
     stop_game = False
     start_game = False
 
+    # set countdown timer variables
     frame_count = 0
     frame_rate = 10
     start_time = 60
@@ -170,12 +95,121 @@ def main():
     # Show instructions at beginning of game
     show_instructions = True
 
-    # Hide winner and loser blurbs at beginning of game
+    # Hide winner / loser blurbs and timer at beginning of game
     show_winner = False
     show_loser = False
     show_timer = False
 
+
+    # Game loop
     while not stop_game:
+
+        # --------- PRINT FUNCTIONS --------- #
+
+        def print_instructions():
+            font = pygame.font.Font(None, 30)
+            font2 = pygame.font.Font(None, 25)
+            text1 = font.render("CAT AND MOUSE", True, (255, 255, 255))
+            text2 = font2.render("60 seconds on the clock!", True, (255, 255, 255))
+            text3 = font2.render("Use the up and down keys to", True, (255, 255, 255))
+            text4 = font2.render("move your cat up and down.", True, (255, 255, 255))
+            text5 = font2.render("For every mouse you catch", True, (255, 255, 255))
+            text6 = font2.render("you'll get a milk carton.", True, (255, 255, 255))
+            text7 = font2.render("Get 10 milk cartons and you win!", True, (255, 255, 255))
+            text8 = font2.render("Ready to play? (y / n)", True, (255, 255, 255))
+            blurb = pygame.image.load("images/chat.png")
+            screen.blit(blurb, (400, 90))
+            screen.blit(text1, (500, 140))
+
+            screen.blit(text2, (460, 190))
+
+            screen.blit(text3, (460, 210))
+            screen.blit(text4, (460, 230))
+
+            screen.blit(text5, (460, 250))
+            screen.blit(text6, (460, 270))
+
+            screen.blit(text7, (460, 290))
+
+            screen.blit(text8, (460, 310))
+
+        def print_winner():
+            font = pygame.font.Font(None, 30)
+            font2 = pygame.font.Font(None, 25)
+            text1 = font.render("CONGRATS YOU WON!", True, (255, 255, 255))
+            text2 = font2.render("Very nice work.", True, (255, 255, 255))
+            text3 = font2.render("Kitty now gets to drink all", True, (255, 255, 255))
+            text4 = font2.render("this milk as his reward.", True, (255, 255, 255))
+            text5 = font2.render("MEEEEEEOOOOOW", True, (255, 255, 255))
+            text6 = font2.render("Do you want to play again? (y / n)", True, (255, 255, 255))
+            blurb = pygame.image.load("images/chat.png")
+            screen.blit(blurb, (400, 100))
+            screen.blit(text1, (500, 150))
+            screen.blit(text2, (440, 200))
+            screen.blit(text3, (440, 220))
+            screen.blit(text4, (440, 240))
+            screen.blit(text5, (440, 260))
+            screen.blit(text6, (440, 280))
+
+        def print_loser():
+            font = pygame.font.Font(None, 30)
+            font2 = pygame.font.Font(None, 25)
+            text1 = font.render("OH NO TIME RAN OUT!", True, (255, 255, 255))
+            text2 = font2.render("Very sad.", True, (255, 255, 255))
+            text3 = font2.render("Kitty is so thirsty and", True, (255, 255, 255))
+            text4 = font2.render("doesn't have enough milk to drink.", True, (255, 255, 255))
+            text5 = font2.render("MEEEEEEOOOOOW", True, (255, 255, 255))
+            text6 = font2.render("Do you want to play again? (y / n)", True, (255, 255, 255))
+            blurb = pygame.image.load("images/chat.png")
+            screen.blit(blurb, (400, 100))
+            screen.blit(text1, (500, 150))
+            screen.blit(text2, (440, 200))
+            screen.blit(text3, (440, 220))
+            screen.blit(text4, (440, 240))
+            screen.blit(text5, (440, 260))
+            screen.blit(text6, (440, 280))
+
+        def print_background():
+            background = pygame.image.load("images/background.jpg").convert_alpha()
+            screen.blit(background, (0, 0))
+
+
+        # --------- EVENT HANDLING --------- #
+
+        for event in pygame.event.get():
+
+            # Move cat with up and down arrows
+            if event.type == pygame.KEYUP:
+                cat.keyup(event)
+            if event.type == pygame.KEYDOWN:
+                cat.keydown(event)
+
+                # If player hits "y"
+                if event.key == 121:
+                    # Hide blurbs
+                    show_instructions = False
+                    show_winner = False
+                    show_loser = False
+
+                    # Start game and timer, reset mice set
+                    start_game = True
+                    show_timer = True
+                    caught_mice = set()
+
+                # Quit game if player hits "n"
+                if event.key == 110:
+                    return
+            # Quit game if player hits red quit button
+            if event.type == pygame.QUIT:
+                stop_game = True
+
+
+        # --------- GAME LOGIC --------- #
+
+        # Draw cat and mouse when game begins
+        if start_game == True:
+            cat.update(width, height)
+            mouse.update()
 
         #Counter for sending out a new mouse
         counter += 1
@@ -183,55 +217,36 @@ def main():
             mouse = Mouse()
             counter = 0
 
-        # Event handling
-        for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN:
-                cat.keydown(event)
-            if event.type == pygame.KEYUP:
-                cat.keyup(event)
-            if event.type == pygame.KEYDOWN:
-                if event.key == 121:
-                    # If you want to start playing, Hide blurbs
-                    show_instructions = False
-                    show_winner = False
-                    show_loser = False
-                    show_timer = True
-                    # Start game
-                    start_game = True
-                    caught_mice = set()
-
-
-                # Quit game if player hits "y"
-                if event.key == 110:
-                    return
-            if event.type == pygame.QUIT:
-                stop_game = True
-
-
-        # Game logic
-
-        # Start game when player hits "y"
-        if start_game == True:
-            cat.update(width, height)
-            mouse.update()
-
         # Draw background
-        background = pygame.image.load("images/background.jpg").convert_alpha()
-        screen.blit(background, (0, 0))
+        print_background()
 
         # Draw milk cartons
         milk = pygame.image.load("images/milk.png").convert_alpha()
         if len(caught_mice) >= 1:
-            screen.blit(milk, (200, 510))
+            screen.blit(milk, (125, 510))
         if len(caught_mice) >= 2:
-            screen.blit(milk, (240, 510))
+            screen.blit(milk, (160, 510))
         if len(caught_mice) >= 3:
-            screen.blit(milk, (280, 510))
-        if len(caught_mice) == 4:
-            screen.blit(milk, (320, 510))
+            screen.blit(milk, (195, 510))
+        if len(caught_mice) >= 4:
+            screen.blit(milk, (230, 510))
+        if len(caught_mice) >= 5:
+            screen.blit(milk, (265, 510))
+        if len(caught_mice) >= 6:
+            screen.blit(milk, (300, 510))
+        if len(caught_mice) >= 7:
+            screen.blit(milk, (335, 510))
+        if len(caught_mice) >= 8:
+            screen.blit(milk, (370, 510))
+        if len(caught_mice) >= 9:
+            screen.blit(milk, (405, 510))
+        if len(caught_mice) == 10:
+            # Winner scenario
+            screen.blit(milk, (440, 510))
             show_timer = False
             start_game = False
             show_winner = True
+            # reset animal positions and timer
             cat.x = 700
             cat.y = 472
             mouse.x = -64
@@ -249,16 +264,19 @@ def main():
             screen.blit(time_text, [490, 520])
             frame_count += 1
             if seconds == 0:
+                # Loser scenario
                 show_timer = False
                 start_game = False
                 show_loser = True
+                # reset animal positions and timer
                 cat.x = 700
                 cat.y = 472
                 mouse.x = -64
                 frame_count = 0
 
 
-        ##### GAME DISPLAY ######
+        # --------- GAME DISPLAY --------- #
+
         # Show and hide instructions blurb
         if show_instructions == True:
             print_instructions()
@@ -269,14 +287,16 @@ def main():
         if show_loser == True:
             print_loser()
 
+        # Show cat
         cat.render(screen)
-        # Check for caught mice
-        if collision_detection():
+
+        # Check for caught mice / show uncaught mice
+        if cat.collision_detection(cat, mouse, height, width):
             mouse.render(screen)
         else:
             caught_mice.add(mouse)
 
-
+        # Update display
         pygame.display.update()
         clock.tick(frame_rate)
 
