@@ -12,7 +12,7 @@ class Cat(object):
     def __init__(self):
         self.height = 78
         self.width = 96
-        self.image = pygame.image.load("images/cat2.png").convert_alpha()
+        self.image = pygame.image.load("images/cat.png").convert_alpha()
         self.x = 700
         self.y = 472
         self.speed_x = 0
@@ -62,9 +62,9 @@ class Mouse(object):
     def __init__(self):
         self.height = 27
         self.width = 64
-        self.image = pygame.image.load("images/mouse3.png").convert_alpha()
+        self.image = pygame.image.load("images/mouse.png").convert_alpha()
         self.x = -64
-        self.y = random.randint(64, 500)
+        self.y = 400 #random.randint(64, 500)
         self.speed_x = random.randint(40, 70)
         self.speed_y = 0
 
@@ -88,7 +88,7 @@ def main():
         text6 = font2.render("you'll get a milk carton.", True, (255, 255, 255))
         text7 = font2.render("Get 4 milk cartons and you win!", True, (255, 255, 255))
         text8 = font2.render("Ready to play? (y / n)", True, (255, 255, 255))
-        blurb = pygame.image.load("images/chat3.png")
+        blurb = pygame.image.load("images/chat.png")
         screen.blit(blurb, (400, 100))
         screen.blit(text1, (500, 150))
         screen.blit(text2, (440, 200))
@@ -108,7 +108,25 @@ def main():
         text4 = font2.render("this milk as his reward.", True, (255, 255, 255))
         text5 = font2.render("MEEEEEEOOOOOW", True, (255, 255, 255))
         text6 = font2.render("Do you want to play again? (y / n)", True, (255, 255, 255))
-        blurb = pygame.image.load("images/chat3.png")
+        blurb = pygame.image.load("images/chat.png")
+        screen.blit(blurb, (400, 100))
+        screen.blit(text1, (500, 150))
+        screen.blit(text2, (440, 200))
+        screen.blit(text3, (440, 220))
+        screen.blit(text4, (440, 240))
+        screen.blit(text5, (440, 260))
+        screen.blit(text6, (440, 280))
+
+    def print_loser():
+        font = pygame.font.Font(None, 30)
+        font2 = pygame.font.Font(None, 25)
+        text1 = font.render("OH NO TIME RAN OUT!", True, (255, 255, 255))
+        text2 = font2.render("Very sad.", True, (255, 255, 255))
+        text3 = font2.render("Kitty is so thirsty and", True, (255, 255, 255))
+        text4 = font2.render("doesn't have enough milk to drink.", True, (255, 255, 255))
+        text5 = font2.render("MEEEEEEOOOOOW", True, (255, 255, 255))
+        text6 = font2.render("Do you want to play again? (y / n)", True, (255, 255, 255))
+        blurb = pygame.image.load("images/chat.png")
         screen.blit(blurb, (400, 100))
         screen.blit(text1, (500, 150))
         screen.blit(text2, (440, 200))
@@ -118,10 +136,10 @@ def main():
         screen.blit(text6, (440, 280))
 
     def collision_detection():
-        # if (cat.x + 96 < mouse.x) or (mouse.x + 64 < cat.x) or (cat.y + 64 < mouse.y) or (mouse.y + 64 < cat.y):
-        #     return True
-        # else:
-        #     return False
+        if (cat.x + 96 < mouse.x) or (mouse.x + 64 < cat.x) or (cat.y + 64 < mouse.y) or (mouse.y + 64 < cat.y):
+            return True
+        else:
+            return False
         if (cat.x < (mouse.x + mouse.width) and (cat.x + cat.width) > mouse.x and cat.y < (mouse.y + mouse.height) and (cat.height + cat.y) > mouse.y):
             return False
         else:
@@ -145,17 +163,23 @@ def main():
     stop_game = False
     start_game = False
 
+    frame_count = 0
+    frame_rate = 10
+    start_time = 60
+
     # Show instructions at beginning of game
     show_instructions = True
 
-    # Hide winner blurb at beginning of game
+    # Hide winner and loser blurbs at beginning of game
     show_winner = False
+    show_loser = False
+    show_timer = False
 
     while not stop_game:
 
         #Counter for sending out a new mouse
         counter += 1
-        if counter >= 30:
+        if counter >= 20:
             mouse = Mouse()
             counter = 0
 
@@ -170,9 +194,13 @@ def main():
                     # If you want to start playing, Hide blurbs
                     show_instructions = False
                     show_winner = False
+                    show_loser = False
+                    show_timer = True
                     # Start game
                     start_game = True
                     caught_mice = set()
+
+
                 # Quit game if player hits "y"
                 if event.key == 110:
                     return
@@ -201,26 +229,45 @@ def main():
             screen.blit(milk, (280, 510))
         if len(caught_mice) == 4:
             screen.blit(milk, (320, 510))
+            show_timer = False
             start_game = False
             show_winner = True
             cat.x = 700
             cat.y = 472
             mouse.x = -64
+            frame_count = 0
 
-        # Game timer
-        seconds_counter = strftime("00:%S", gmtime())
-        font = pygame.font.Font(None, 50)
-        time_text = font.render(seconds_counter, True, (255, 255,255))
-        screen.blit(time_text, (510, 520))
+        # Draw timer
+        if show_timer == True:
+            total_seconds = start_time - (frame_count // frame_rate)
+            if total_seconds < 0:
+                total_seconds = 0
+            seconds = total_seconds % 61
+            output_string = "Time: %s" % seconds
+            font = pygame.font.Font(None, 50)
+            time_text = font.render(output_string, True, (255, 255, 255))
+            screen.blit(time_text, [490, 520])
+            frame_count += 1
+            if seconds == 0:
+                show_timer = False
+                start_game = False
+                show_loser = True
+                cat.x = 700
+                cat.y = 472
+                mouse.x = -64
+                frame_count = 0
+
 
         ##### GAME DISPLAY ######
         # Show and hide instructions blurb
         if show_instructions == True:
             print_instructions()
 
-        # Show and hide winner blurb
+        # Show and hide winner and blurbs
         if show_winner == True:
             print_winner()
+        if show_loser == True:
+            print_loser()
 
         cat.render(screen)
         # Check for caught mice
@@ -231,11 +278,10 @@ def main():
 
 
         pygame.display.update()
-        clock.tick(10)
+        clock.tick(frame_rate)
 
 
     pygame.quit()
-
 
 if __name__ == '__main__':
     main()
