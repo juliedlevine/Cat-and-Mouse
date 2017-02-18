@@ -57,7 +57,7 @@ class Mouse(Animal):
         self.image = pygame.image.load("images/mouse.png").convert_alpha()
         self.x = -64
         self.y = random.randint(64, 500)
-        self.speed_x = random.randint(40, 70)
+        self.speed_x = random.randint(30, 50)
         self.speed_y = 0
 
     def update(self):
@@ -74,6 +74,9 @@ def main():
     height = 568
 
     # Initialize pygame
+    pygame.mixer.init()
+    sound = pygame.mixer.Sound('sounds/boing2.wav')
+    bg_music = pygame.mixer.Sound('sounds/bg_music.wav')
     pygame.init()
     screen = pygame.display.set_mode((width, height))
     pygame.display.set_caption('Cat and Mouse')
@@ -99,6 +102,7 @@ def main():
     show_winner = False
     show_loser = False
     show_timer = False
+    sound_effect= False
 
 
     # Game loop
@@ -120,17 +124,12 @@ def main():
             blurb = pygame.image.load("images/chat.png")
             screen.blit(blurb, (400, 90))
             screen.blit(text1, (500, 140))
-
             screen.blit(text2, (460, 190))
-
             screen.blit(text3, (460, 210))
             screen.blit(text4, (460, 230))
-
             screen.blit(text5, (460, 250))
             screen.blit(text6, (460, 270))
-
             screen.blit(text7, (460, 290))
-
             screen.blit(text8, (460, 310))
 
         def print_winner():
@@ -192,6 +191,7 @@ def main():
                     show_loser = False
 
                     # Start game and timer, reset mice set
+                    bg_music.play(-1)
                     start_game = True
                     show_timer = True
                     caught_mice = set()
@@ -213,7 +213,7 @@ def main():
 
         #Counter for sending out a new mouse
         counter += 1
-        if counter >= 20:
+        if counter == 35:
             mouse = Mouse()
             counter = 0
 
@@ -246,6 +246,7 @@ def main():
             show_timer = False
             start_game = False
             show_winner = True
+            bg_music.stop()
             # reset animal positions and timer
             cat.x = 700
             cat.y = 472
@@ -258,16 +259,19 @@ def main():
             if total_seconds < 0:
                 total_seconds = 0
             seconds = total_seconds % 61
-            output_string = "Time: %s" % seconds
+            output_string = ": %s" % seconds
             font = pygame.font.Font(None, 50)
             time_text = font.render(output_string, True, (255, 255, 255))
-            screen.blit(time_text, [490, 520])
+            timer_pic = pygame.image.load("images/stopwatch.png").convert_alpha()
+            screen.blit(timer_pic, [505, 520])
+            screen.blit(time_text, [540, 520])
             frame_count += 1
             if seconds == 0:
                 # Loser scenario
                 show_timer = False
                 start_game = False
                 show_loser = True
+                bg_music.stop()
                 # reset animal positions and timer
                 cat.x = 700
                 cat.y = 472
@@ -294,11 +298,13 @@ def main():
         if cat.collision_detection(cat, mouse, height, width):
             mouse.render(screen)
         else:
+            sound.play()
             caught_mice.add(mouse)
 
         # Update display
         pygame.display.update()
         clock.tick(frame_rate)
+
 
 
     pygame.quit()
