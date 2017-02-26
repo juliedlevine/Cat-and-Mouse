@@ -8,8 +8,8 @@ Cat and Mouse is an interactive single player game. In order to play the user mu
 Mice run across the screen from left to right, fast and frequent. Player moves cat up and down at the right of the screen. If cat collides with mouse it is "caught". For each mouse the player catches they gain a milk carton.
 
 ##Languages used
-Python
-Pygame module
+* Python
+* Pygame module
 
 ##Challenges
 ###Mouse collision sound
@@ -51,7 +51,9 @@ if event.key == 121:
 
 ##More Code Snippets
 Cat Object. keydown and keyup functions create smooth movement for the cat. The update function checks the bounds of the cat and keeps it from being able to move outside the screen.
-```pythonclass Cat(Animal):
+
+```python
+class Cat(Animal):
     def __init__(self):
         Animal.__init__(self)
         self.height = 78
@@ -142,4 +144,4 @@ Text blurb pops up with a message and asks the player if they want to play again
 
 ##Winner
 If the player catches 10 mice on Level 2 the win screen appears. Cat automatically repositions to the bottom right corner of the screen. Player can choose to start game over, beginning at Level 1 again (hit key 'y') or quit game (hit key 'n').
-![alt text](https://github.com/juliemdyer/Cat-and-Mouse/blob/master/screenshots/winner_screen.png)
+![alt text](https://github.com/juliemdyer/Cat-and-Mouse/blob/master/screenshots/winner_screen.png).
