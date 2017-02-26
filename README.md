@@ -8,18 +8,11 @@ Cat and Mouse is an interactive single player game. In order to play the user mu
 Mice run across the screen from left to right, fast and frequent. Player moves cat up and down at the right of the screen. If cat collides with mouse it is "caught". For each mouse the player catches they gain a milk carton.
 
 ##Languages used
-    *Python
-    *Pygame module
-
-##Requirements
-You'll need to install Python on your system if you don't already have it - my system's running on Python 2 not 3, which can be downloaded [here](https://www.python.org/downloads/).
-
-After that, in order to install Pygame, you'll need to make sure your pip and setup tools are up to date, which can be done through the instructions [here](https://packaging.python.org/installing/).
-
-Finally, you can install the Pygame modules using these instruction [here](http://www.pygame.org/wiki/CompileUbuntu)
+Python
+Pygame module
 
 ##Challenges
-    *Mouse collision sound
+###Mouse collision sound
 I wanted a single sound effect to play when a mouse collided with the cat. What ended up happening was a bunch of sounds would piggyback on each other and play quickly right after each other. I added some print statements to the code where the collisions was happening and realized the computer was registering multiple collisions instead of just one.
 Solution: The solution was to make a copy of the caught_mice set. This set was keeping track of the number of mice that had been caught at any given time. I compared the length of the caught_mice set to the copy. If the original set is larger than the copy then that means a mouse has been caught and we want to play a sound. Then I re-set the copy to the original set to be ready to check again. This fixed the multiple sound effect problem.
 
@@ -36,7 +29,7 @@ if len(caught_mice) > len(caught_mice_copy):
     caught_mice_copy = set(caught_mice)
 ```
 
-    *Adding a second level
+###Adding a second level
 I had trouble finding a way to keep track of what level the player was on. My initial idea was to just add a Level counter that initialized at 0, and would add 1 during the win scenario. But when I printed this out to the console it added 1 a bunch of times so the counter continued to increase.
 Solution: I had to add the level counter in the Event Handling section. the level is increased when a player hits the 'y' key after each level. I don't think this is a great solution because if the y key gets hit during the game for any reason the counter will be off, and the levels wont work correctly. So I'd like to re-visit this and come up with a better solution.
 
@@ -91,7 +84,8 @@ Cat Object. keydown and keyup functions create smooth movement for the cat. The 
             self.y += self.speed_y
 ```
 
-Game timer. If countdown gets to 0 Loser scenario runs and resets animal positions, timer and shows the loser blurb. 
+Game timer. If countdown gets to 0 Loser scenario runs and resets animal positions, timer and shows the loser blurb.
+
 ```python
 # Draw timer
 if show_timer == True:
